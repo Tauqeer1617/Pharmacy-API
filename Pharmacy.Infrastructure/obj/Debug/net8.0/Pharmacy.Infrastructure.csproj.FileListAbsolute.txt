@@ -1,0 +1,17 @@
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\bin\Debug\net8.0\Pharmacy.Infrastructure.deps.json
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\bin\Debug\net8.0\Pharmacy.Infrastructure.runtimeconfig.json
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\bin\Debug\net8.0\Pharmacy.Infrastructure.dll
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\bin\Debug\net8.0\Pharmacy.Infrastructure.pdb
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\bin\Debug\net8.0\Pharmacy.Domain.dll
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\bin\Debug\net8.0\Pharmacy.Domain.pdb
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\obj\Debug\net8.0\Pharmacy.Infrastructure.csproj.AssemblyReference.cache
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\obj\Debug\net8.0\Pharmacy.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\obj\Debug\net8.0\Pharmacy.Infrastructure.AssemblyInfoInputs.cache
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\obj\Debug\net8.0\Pharmacy.Infrastructure.AssemblyInfo.cs
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\obj\Debug\net8.0\Pharmacy.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\obj\Debug\net8.0\Pharmacy.9823B222.Up2Date
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\obj\Debug\net8.0\Pharmacy.Infrastructure.dll
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\obj\Debug\net8.0\refint\Pharmacy.Infrastructure.dll
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\obj\Debug\net8.0\Pharmacy.Infrastructure.pdb
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\obj\Debug\net8.0\Pharmacy.Infrastructure.genruntimeconfig.cache
+C:\Tauqeer\PharmacyManagementSystem\PharmacyManagementSystem\Pharmacy.Infrastructure\obj\Debug\net8.0\ref\Pharmacy.Infrastructure.dll

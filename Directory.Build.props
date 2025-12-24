@@ -1,0 +1,10 @@
+<Project>
+  <ItemGroup>
+    <PackageReference Update="Microsoft.EntityFrameworkCore" Version="8.0.11" />
+    <PackageReference Update="Microsoft.EntityFrameworkCore.Design" Version="8.0.11" />
+    <PackageReference Update="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+    <PackageReference Update="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11" />
+    <PackageReference Update="FluentValidation" Version="11.9.0" />
+    <PackageReference Update="FluentValidation.AspNetCore" Version="11.3.0" />
+  </ItemGroup>
+</Project>
