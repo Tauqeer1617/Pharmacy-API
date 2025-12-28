@@ -57,11 +57,20 @@ builder.Services.AddScoped<IMemberService, MemberService>(sp =>
 });
 builder.Services.AddScoped<IProviderService, ProviderService>();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+
+// ====================== AUTO MIGRATION ======================
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<PharmacyDbContext>();
+    dbContext.Database.Migrate();
+}
+// ===========================================================
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
