@@ -8,20 +8,33 @@ using Pharmacy.Application.Services.Implementations;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Pharmacy.Infrastructure.Services;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// ======================= Add Services =======================
+
+// Add controllers
 builder.Services.AddControllers();
 
-// Add RedisCacheService
-builder.Services.AddSingleton<RedisCacheService>(sp =>
+// Add Redis ConnectionMultiplexer (Singleton)
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection");
-    return new RedisCacheService(redisConnectionString);
+    var configuration = ConfigurationOptions.Parse(
+        builder.Configuration.GetConnectionString("RedisConnection")
+    );
+
+    configuration.AbortOnConnectFail = false; // App won't crash if Redis is down
+    configuration.ConnectRetry = 5;           // Retry 5 times
+    configuration.ConnectTimeout = 5000;      // 5-second timeout
+
+    return ConnectionMultiplexer.Connect(configuration);
 });
 
-// Add CORS configuration
+// Add RedisCacheService (Singleton)
+builder.Services.AddSingleton<RedisCacheService>();
+
+// Configure CORS (Allow all)
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -32,11 +45,11 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add FluentValidation
+// FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(Pharmacy.Application.DTOs.Members.MemberDto).Assembly);
 
-// Add Entity Framework
+// Entity Framework Core
 builder.Services.AddDbContext<PharmacyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("PharmacyConnection")));
 
@@ -55,11 +68,15 @@ builder.Services.AddScoped<IMemberService, MemberService>(sp =>
     var redisCache = sp.GetRequiredService<RedisCacheService>();
     return new MemberService(unitOfWork, redisCache);
 });
+
 builder.Services.AddScoped<IProviderService, ProviderService>();
 
+// Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+// ======================= Build App =======================
 var app = builder.Build();
 
 
@@ -72,7 +89,7 @@ using (var scope = app.Services.CreateScope())
 // ===========================================================
 
 
-// Configure the HTTP request pipeline.
+// ======================= Configure Pipeline =======================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
