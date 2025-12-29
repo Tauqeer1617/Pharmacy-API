@@ -2,11 +2,9 @@ name: .NET Core CI/CD to AWS EC2 (systemd)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
@@ -14,12 +12,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x' # Change to your .NET version
+        dotnet-version: '8.0.x'
 
     - name: Restore dependencies
       run: dotnet restore
@@ -28,17 +26,16 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Run tests
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --configuration Release --no-build --verbosity normal
 
     - name: Publish
-      run: dotnet publish -c Release -o ./publish
+      run: dotnet publish -c Release -o publish
 
     - name: Zip published files
-      run: zip -r publish.zip ./publish
+      run: zip -r publish.zip publish
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
-
       with:
         name: dotnet-api
         path: publish.zip
@@ -50,10 +47,8 @@ jobs:
     steps:
     - name: Download artifact
       uses: actions/download-artifact@v4
-
       with:
         name: dotnet-api
-        path: .
 
     - name: Copy files to EC2
       uses: appleboy/scp-action@v0.1.7
@@ -61,48 +56,48 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
-        port: ${{ secrets.EC2_PORT || '22' }}
-        source: "publish.zip"
-        target: "/home/${{ secrets.EC2_USER }}/app/"
+        port: 22
+        source: publish.zip
+        target: /home/${{ secrets.EC2_USER }}/app/
 
-    - name: SSH and deploy on EC2
+    - name: Deploy on EC2
       uses: appleboy/ssh-action@v0.1.6
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
-        port: ${{ secrets.EC2_PORT || '22' }}
+        port: 22
         script: |
-          # Navigate to app folder
+          sudo apt-get update -y
+          sudo apt-get install -y unzip
+
+          mkdir -p /home/${{ secrets.EC2_USER }}/app
           cd /home/${{ secrets.EC2_USER }}/app
 
-          # Unzip published files directly into the app folder
-          unzip -o publish.zip -d ./
+          unzip -o publish.zip
 
-          # Create systemd service file
-          SERVICE_FILE=/etc/systemd/system/mywebapi.service
+          SERVICE_FILE=/etc/systemd/system/pharmacy-api.service
+
           sudo bash -c "cat > $SERVICE_FILE <<EOF
           [Unit]
-          Description=My .NET Core Web API
+          Description=Pharmacy .NET Web API
           After=network.target
 
           [Service]
-          WorkingDirectory=/home/${{ secrets.EC2_USER }}/app
-          ExecStart=/usr/bin/dotnet /home/${{ secrets.EC2_USER }}/app/MyWebApi.dll
+          WorkingDirectory=/home/${{ secrets.EC2_USER }}/app/publish
+          ExecStart=/usr/bin/dotnet /home/${{ secrets.EC2_USER }}/app/publish/Pharmacy.API.dll
           Restart=always
           RestartSec=10
-          SyslogIdentifier=MyWebApi
           User=${{ secrets.EC2_USER }}
           Environment=ASPNETCORE_ENVIRONMENT=Production
-          # Add other environment variables if needed:
-          # Environment=ConnectionStrings__DefaultConnection="YourConnectionStringHere"
+          Environment=ConnectionStrings__DefaultConnection=${{ secrets.DB_CONNECTION_STRING }}
+          Environment=API_KEY=${{ secrets.API_KEY }}
 
           [Install]
           WantedBy=multi-user.target
           EOF"
 
-          # Reload systemd, enable and restart service
           sudo systemctl daemon-reload
-          sudo systemctl enable mywebapi.service
-          sudo systemctl restart mywebapi.service
-          sudo systemctl status mywebapi.service --no-pager
+          sudo systemctl enable pharmacy-api
+          sudo systemctl restart pharmacy-api
+          sudo systemctl status pharmacy-api --no-pager
