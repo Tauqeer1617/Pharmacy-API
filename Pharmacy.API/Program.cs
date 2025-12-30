@@ -17,22 +17,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Add controllers
 builder.Services.AddControllers();
 
-// Add Redis ConnectionMultiplexer (Singleton)
-builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+// Optional Redis setup
+var redisConn = builder.Configuration.GetConnectionString("RedisConnection");
+if (!string.IsNullOrEmpty(redisConn))
 {
-    var configuration = ConfigurationOptions.Parse(
-        builder.Configuration.GetConnectionString("RedisConnection")
-    );
+    builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    {
+        var configuration = ConfigurationOptions.Parse(redisConn);
+        configuration.AbortOnConnectFail = false;
+        configuration.ConnectRetry = 5;
+        configuration.ConnectTimeout = 5000;
+        return ConnectionMultiplexer.Connect(configuration);
+    });
 
-    configuration.AbortOnConnectFail = false; // App won't crash if Redis is down
-    configuration.ConnectRetry = 5;           // Retry 5 times
-    configuration.ConnectTimeout = 5000;      // 5-second timeout
-
-    return ConnectionMultiplexer.Connect(configuration);
-});
-
-// Add RedisCacheService (Singleton)
-builder.Services.AddSingleton<RedisCacheService>();
+    builder.Services.AddSingleton<RedisCacheService>();
+}
 
 // Configure CORS (Allow all)
 builder.Services.AddCors(options =>
@@ -65,7 +64,9 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IMemberService, MemberService>(sp =>
 {
     var unitOfWork = sp.GetRequiredService<IUnitOfWork>();
-    var redisCache = sp.GetRequiredService<RedisCacheService>();
+
+    // RedisCacheService is optional — resolve if available
+    var redisCache = sp.GetService<RedisCacheService>();
     return new MemberService(unitOfWork, redisCache);
 });
 
@@ -75,10 +76,8 @@ builder.Services.AddScoped<IProviderService, ProviderService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 // ======================= Build App =======================
 var app = builder.Build();
-
 
 // ====================== AUTO MIGRATION ======================
 using (var scope = app.Services.CreateScope())
@@ -87,7 +86,6 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 // ===========================================================
-
 
 // ======================= Configure Pipeline =======================
 if (app.Environment.IsDevelopment())
