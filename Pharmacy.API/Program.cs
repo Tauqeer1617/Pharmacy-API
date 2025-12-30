@@ -88,11 +88,9 @@ using (var scope = app.Services.CreateScope())
 // ===========================================================
 
 // ======================= Configure Pipeline =======================
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Enable Swagger in both Development and Production
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Enable CORS
 app.UseCors();
